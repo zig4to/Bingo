@@ -28,6 +28,7 @@ npm run build
 | Migracija | Vsebina |
 |---|---|
 | `0001_init` | `bingo_boards` (`user_id`, `year`, `title`, `size` 3–6, unique `(user_id, year)`), `bingo_cells` (`board_id`, `position` 0…size²−1 po vrsticah, `text`, `done`, `done_at`, `note`, unique `(board_id, position)`), RLS: samo lastnik |
+| `0002_counters` | `bingo_counters` (`name`, `color` = ključ iz `src/lib/counter/colors.ts`, `goal` neobvezen letni cilj, `position`), `bingo_counter_entries` (`counter_id`, `user_id`, `day`, `note`), RLS: samo lastnik |
 
 Obe izvedeni prek Supabase MCP 2026-11-08 (`bingo_init`, `bingo_seed_2026` = `supabase/seed_2026.sql`, 25 ciljev za Žigo).
 
@@ -43,6 +44,7 @@ Polja se zapišejo šele, ko jih urediš (upsert na `(board_id, position)`); man
   Prazno polje vedno odpre urejanje. Prihodnje leto ali prazna tabla se odpre v načinu Uredi.
 - Naslov „Adventure Bingo“ se izriše kot velik „ADVENTURE“ + „BINGO“ pod njim.
 - Mutacije: `src/actions/bingo.ts`.
+- `/stevec` (`CounterBoard`): `?leto=`, barvne kartice števcev (letni seštevek vnosov, napredek do cilja), klik → `EntryDialog` (dan + opomba, seznam vnosov leta; klik na vnos ga uredi, koš izbriše; svinčnik → `CounterDialog`: ime, barva, cilj, brisanje). Spodaj „Zadnji vnosi“. Mutacije `src/actions/counters.ts`. Zavihka Bingo/Števec sta v `NavTabs` na sredini zgornje vrstice.
 - `/nastavitve`: tema, odjava.
 
 ## Pasti

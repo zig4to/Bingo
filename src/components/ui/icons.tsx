@@ -473,3 +473,9 @@ export const IconGrid = (p: SVGProps<SVGSVGElement>) => (
     <path d="M3 9h18M3 15h18M9 3v18M15 3v18" />
   </Base>
 );
+
+export const IconTally = (p: SVGProps<SVGSVGElement>) => (
+  <Base {...p}>
+    <path d="M4 4v16M9 4v16M14 4v16M19 4v16M22 6 2 18" />
+  </Base>
+);

@@ -29,11 +29,32 @@ export type BingoCell = {
   updated_at: string;
 };
 
+export type BingoCounter = {
+  id: string;
+  user_id: string;
+  name: string;
+  color: string; // ključ barve iz src/lib/counter/colors.ts
+  goal: number | null; // letni cilj (npr. 50x), neobvezen
+  position: number;
+  created_at: string;
+};
+
+export type BingoCounterEntry = {
+  id: string;
+  counter_id: string;
+  user_id: string;
+  day: string; // YYYY-MM-DD
+  note: string | null;
+  created_at: string;
+};
+
 export type Database = {
   public: {
     Tables: {
       bingo_boards: Table<BingoBoard, "year">;
       bingo_cells: Table<BingoCell, "board_id" | "position">;
+      bingo_counters: Table<BingoCounter, "name">;
+      bingo_counter_entries: Table<BingoCounterEntry, "counter_id">;
     };
     Views: Record<string, never>;
     Functions: Record<string, never>;
