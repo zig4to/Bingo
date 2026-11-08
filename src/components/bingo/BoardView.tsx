@@ -107,7 +107,7 @@ export default function BoardView({
   return (
     <div className="space-y-4">
       {/* Leta */}
-      <div className="flex items-center gap-1.5 overflow-x-auto py-1">
+      <div className="no-scrollbar flex items-center gap-1.5 overflow-x-auto py-1">
         {years.map((y) => (
           <Link
             key={y.id}

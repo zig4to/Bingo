@@ -52,3 +52,11 @@ body {
 [data-sso="pending"] #login-card {
   display: none;
 }
+
+/* Skrit drsnik (vsebina se še vedno drsa — kolesce, prst, tipkovnica). */
+.no-scrollbar {
+  scrollbar-width: none;
+}
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}

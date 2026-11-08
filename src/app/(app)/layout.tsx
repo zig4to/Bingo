@@ -19,7 +19,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
           <IconSettings className="h-5 w-5" />
         </Link>
       </header>
-      <div className="flex min-h-0 flex-1 flex-col overflow-y-auto">
+      <div className="no-scrollbar flex min-h-0 flex-1 flex-col overflow-y-auto">
         <main className="mx-auto w-full max-w-2xl px-3 py-5 sm:px-4">{children}</main>
       </div>
     </div>
