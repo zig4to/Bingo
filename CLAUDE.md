@@ -61,7 +61,7 @@ Ni testov (`npm test` ne obstaja).
 |---|---|---|
 | `0001_init` | `bingo_boards` (`user_id` default `auth.uid()`, `year`, `title` default „Adventure Bingo“, `size` 3–6, unique `(user_id, year)`), `bingo_cells` (`board_id`, `position` 0…size²−1 po vrsticah, `text` ≤ 120, `done`, `done_at`, `note`, `updated_at`, unique `(board_id, position)`), RLS: samo lastnik (celice prek table) | izvedena 2026-11-08 (`bingo_init`) |
 | `seed_2026.sql` | Adventure Bingo 2026 s 25 cilji s slike za `ziga.skater@gmail.com` (idempotentno, `on conflict`) | izveden 2026-11-08 (`bingo_seed_2026`) |
-| `0002_counters` | `bingo_counters` (`name` ≤ 40, `color` = ključ iz `src/lib/counter/colors.ts`, `goal` neobvezen letni cilj ≤ 1.000.000, `unit` neobvezna enota ≤ 12 znakov, `position`), `bingo_counter_entries` (`counter_id`, `user_id`, `day` date, `amount` numeric(12,2) > 0 — samo pri števcu z enoto, `note` ≤ 500), RLS: samo lastnik (vnos le v svoj števec) | **še NI izvedena** — stran Števec do takrat ne deluje |
+| `0002_counters` | `bingo_counters` (`name` ≤ 40, `color` = ključ iz `src/lib/counter/colors.ts`, `goal` neobvezen letni cilj ≤ 1.000.000, `unit` neobvezna enota ≤ 12 znakov, `position`), `bingo_counter_entries` (`counter_id`, `user_id`, `day` date, `amount` numeric(12,2) > 0 — samo pri števcu z enoto, `note` ≤ 500), RLS: samo lastnik (vnos le v svoj števec) | izvedena 2026-11-08 (`bingo_counters`) |
 
 Migracije se izvajajo prek Supabase MCP `apply_migration`. Auto mode jih
 zavrača kot „Production Deploy“ — Žiga mora klic odobriti (enkratno ali s
@@ -135,7 +135,7 @@ Tema, e-pošta, odjava.
 - Žiga (`ziga.skater@gmail.com`): Adventure Bingo **2026**, 5 × 5, 25 ciljev
   s slike (zapisani z malimi črkami, prikaz je uppercase; „Buschcraft“ ostal
   kot na sliki), nič še ni odkljukano.
-- Števcev še ni (tabele ne obstajajo, glej `0002_counters`).
+- Števcev še ni (tabele obstajajo od 2026-11-08).
 
 ## Pasti
 
