@@ -29,6 +29,8 @@ npm run build
 |---|---|
 | `0001_init` | `bingo_boards` (`user_id`, `year`, `title`, `size` 3–6, unique `(user_id, year)`), `bingo_cells` (`board_id`, `position` 0…size²−1 po vrsticah, `text`, `done`, `done_at`, `note`, unique `(board_id, position)`), RLS: samo lastnik |
 
+Obe izvedeni prek Supabase MCP 2026-11-08 (`bingo_init`, `bingo_seed_2026` = `supabase/seed_2026.sql`, 25 ciljev za Žigo).
+
 `src/lib/types/database.types.ts` je ročno napisan — ob novi migraciji ga posodobi.
 Polja se zapišejo šele, ko jih urediš (upsert na `(board_id, position)`); manjkajoča so prazna.
 
