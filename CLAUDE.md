@@ -39,7 +39,7 @@ Polja se zapišejo šele, ko jih urediš (upsert na `(board_id, position)`); man
 - `/` (`src/app/(app)/page.tsx`): `?leto=YYYY`, privzeto tekoče leto (ljubljanski čas) ali najbližje. → `BoardView`.
 - `BoardView`: zavihki let + „+ naslednje leto“ (`NewBoardDialog`), meni (preimenuj, izbriši),
   tabla, napredek, število bingov (`src/lib/bingo/lines.ts`: vrstice, stolpci, diagonali).
-  Način **Kljukaj** (tap = preklop opravljeno, optimistično) / **Uredi** (tap = `CellDialog`).
+  Način **Kljukaj** (dva tapa na isto polje v 3 s = preklop opravljeno, optimistično; prvi tap polje obrobi z namigom) / **Uredi** (tap = `CellDialog`).
   Prazno polje vedno odpre urejanje. Prihodnje leto ali prazna tabla se odpre v načinu Uredi.
 - Naslov „Adventure Bingo“ se izriše kot velik „ADVENTURE“ + „BINGO“ pod njim.
 - Mutacije: `src/actions/bingo.ts`.
