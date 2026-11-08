@@ -107,16 +107,16 @@ export default function BoardView({
   return (
     <div className="space-y-4">
       {/* Leta */}
-      <div className="flex items-center gap-1.5 overflow-x-auto pb-1">
+      <div className="flex items-center gap-1.5 overflow-x-auto py-1">
         {years.map((y) => (
           <Link
             key={y.id}
             href={`/?leto=${y.year}`}
             className={clsx(
-              "shrink-0 rounded-full px-3 py-1.5 text-sm font-medium tabular-nums",
+              "shrink-0 rounded-full border px-3 py-1.5 text-sm font-medium tabular-nums",
               y.year === board.year
-                ? "bg-orange-600 text-white"
-                : "bg-white text-gray-600 ring-1 ring-gray-200 hover:bg-gray-50 dark:bg-gray-900 dark:text-gray-300 dark:ring-gray-800 dark:hover:bg-gray-800"
+                ? "border-orange-600 bg-orange-600 text-white"
+                : "border-gray-200 bg-white text-gray-600 hover:bg-gray-50 dark:border-gray-800 dark:bg-gray-900 dark:text-gray-300 dark:hover:bg-gray-800"
             )}
           >
             {y.year}
@@ -125,7 +125,7 @@ export default function BoardView({
         <button
           type="button"
           onClick={() => setDialog("new")}
-          className="flex shrink-0 items-center gap-1 rounded-full px-3 py-1.5 text-sm font-medium text-orange-700 ring-1 ring-dashed ring-orange-300 hover:bg-orange-50 dark:text-orange-300 dark:ring-orange-800 dark:hover:bg-orange-950/40"
+          className="flex shrink-0 items-center gap-1 rounded-full px-3 py-1.5 text-sm font-medium border border-dashed border-orange-400 text-orange-700 hover:bg-orange-50 dark:border-orange-700 dark:text-orange-300 dark:hover:bg-orange-950/40"
         >
           <IconPlus /> {maxYear + 1}
         </button>
