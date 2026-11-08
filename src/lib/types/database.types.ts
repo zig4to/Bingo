@@ -34,7 +34,8 @@ export type BingoCounter = {
   user_id: string;
   name: string;
   color: string; // ključ barve iz src/lib/counter/colors.ts
-  goal: number | null; // letni cilj (npr. 50x), neobvezen
+  goal: number | null; // letni cilj (npr. 50x ali 2000 km), neobvezen
+  unit: string | null; // npr. "km" → števec šteje količino, ne vnosov
   position: number;
   created_at: string;
 };
@@ -44,6 +45,7 @@ export type BingoCounterEntry = {
   counter_id: string;
   user_id: string;
   day: string; // YYYY-MM-DD
+  amount: number | null; // količina v enoti števca (samo pri števcu z enoto)
   note: string | null;
   created_at: string;
 };

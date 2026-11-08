@@ -8,6 +8,7 @@ import { IconChevronLeft, IconChevronRight, IconPlus } from "@/components/ui/ico
 import EntryDialog from "./EntryDialog";
 import CounterDialog from "./CounterDialog";
 import { fmtDay } from "./format";
+import { counterStats, fmtNum } from "@/lib/counter/stats";
 
 const SUGGESTIONS = ["Tek", "Plezanje", "Kolo", "Ledena voda", "Odbojka", "Skejt"];
 
@@ -103,7 +104,7 @@ export default function CounterBoard({
       ) : (
         <div className="flex flex-wrap justify-center gap-3 sm:gap-4">
           {counters.map((c) => (
-            <CounterCard key={c.id} counter={c} count={byCounter.get(c.id)?.length ?? 0} onClick={() => setOpenId(c.id)} />
+            <CounterCard key={c.id} counter={c} entries={byCounter.get(c.id) ?? []} onClick={() => setOpenId(c.id)} />
           ))}
           <button
             type="button"
@@ -136,6 +137,11 @@ export default function CounterBoard({
                   >
                     <span className="h-2.5 w-2.5 shrink-0 rounded-full" style={{ background: gradient(c.color) }} />
                     <span className="shrink-0 text-sm font-semibold">{c.name}</span>
+                    {c.unit && e.amount !== null && (
+                      <span className="shrink-0 text-sm font-semibold tabular-nums" style={{ color: counterColor(c.color).b }}>
+                        {fmtNum(e.amount)} {c.unit}
+                      </span>
+                    )}
                     <span className="min-w-0 flex-1 truncate text-sm text-gray-500 dark:text-gray-400">{e.note}</span>
                     <span className="shrink-0 text-xs tabular-nums text-gray-400 dark:text-gray-500">{fmtDay(e.day)}</span>
                   </button>
@@ -163,10 +169,20 @@ export default function CounterBoard({
   );
 }
 
-function CounterCard({ counter, count, onClick }: { counter: BingoCounter; count: number; onClick: () => void }) {
+function CounterCard({
+  counter,
+  entries,
+  onClick,
+}: {
+  counter: BingoCounter;
+  entries: BingoCounterEntry[];
+  onClick: () => void;
+}) {
   const col = counterColor(counter.color);
-  const pct = counter.goal ? Math.min(100, (count / counter.goal) * 100) : null;
-  const reached = counter.goal !== null && count >= counter.goal;
+  const { sum, main, mainLabel, pct, reached } = counterStats(counter, entries);
+  const mainText = fmtNum(main);
+  // Dolge številke (npr. 1.958,5) pomanjšaj, da ostanejo v kartici.
+  const mainSize = mainText.length <= 3 ? "text-6xl" : mainText.length <= 5 ? "text-5xl" : "text-4xl";
 
   return (
     <button
@@ -194,9 +210,14 @@ function CounterCard({ counter, count, onClick }: { counter: BingoCounter; count
       </div>
 
       <div className="relative flex flex-1 items-center justify-center">
-        <span key={count} className="counter-pop text-6xl font-black tabular-nums drop-shadow-md">
-          {count}
-        </span>
+        <div className="flex flex-col items-center">
+          <span key={main} className={`counter-pop ${mainSize} font-black tabular-nums leading-none drop-shadow-md`}>
+            {mainText}
+          </span>
+          {counter.unit && (
+            <span className="mt-1 text-[11px] font-semibold uppercase tracking-widest text-white/80">{mainLabel}</span>
+          )}
+        </div>
       </div>
 
       <div className="relative">
@@ -205,7 +226,8 @@ function CounterCard({ counter, count, onClick }: { counter: BingoCounter; count
             <div className="mb-1 flex justify-between text-[11px] font-semibold text-white/85">
               <span>{reached ? "Cilj dosežen!" : "Cilj"}</span>
               <span className="tabular-nums">
-                {count} / {counter.goal}
+                {fmtNum(sum)} / {fmtNum(counter.goal ?? 0)}
+                {counter.unit ? ` ${counter.unit}` : ""}
               </span>
             </div>
             <div className="h-1.5 overflow-hidden rounded-full bg-black/20">
@@ -213,9 +235,9 @@ function CounterCard({ counter, count, onClick }: { counter: BingoCounter; count
             </div>
           </>
         ) : (
-          <div className="text-center text-[11px] font-semibold uppercase tracking-widest text-white/75">
-            krat letos
-          </div>
+          !counter.unit && (
+            <div className="text-center text-[11px] font-semibold uppercase tracking-widest text-white/75">{mainLabel}</div>
+          )
         )}
       </div>
     </button>

@@ -10,6 +10,7 @@ import clsx from "@/lib/utils/clsx";
 import Sheet from "./Sheet";
 import CounterDialog from "./CounterDialog";
 import { fmtDay } from "./format";
+import { counterStats, fmtNum } from "@/lib/counter/stats";
 
 /** Klik na kartico: dodaj vnos (dan + opomba), spodaj seznam letošnjih vnosov. */
 export default function EntryDialog({
@@ -29,26 +30,37 @@ export default function EntryDialog({
   const defaultDay = today.startsWith(`${year}-`) ? today : year < Number(today.slice(0, 4)) ? `${year}-12-31` : `${year}-01-01`;
   const [day, setDay] = useState(defaultDay);
   const [note, setNote] = useState("");
+  const [amount, setAmount] = useState("");
   const [editingId, setEditingId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [added, setAdded] = useState(0); // za animacijo gumba
   const [editCounter, setEditCounter] = useState(false);
   const [pending, start] = useTransition();
   const col = counterColor(counter.color);
+  const unit = counter.unit;
+  const stats = counterStats(counter, entries);
+  // „42,5“ ali „42.5“ → 42.5
+  const amountNum = amount.trim() ? Number(amount.replace(",", ".")) : null;
 
   function reset() {
     setEditingId(null);
     setDay(defaultDay);
     setNote("");
+    setAmount("");
   }
 
   function submit(e: React.FormEvent) {
     e.preventDefault();
     setError(null);
+    if (unit && !(amountNum !== null && amountNum > 0)) {
+      setError(`Vpiši količino (${unit}).`);
+      return;
+    }
     start(async () => {
+      const amt = unit ? amountNum : null;
       const res = editingId
-        ? await updateEntryAction({ id: editingId, day, note })
-        : await addEntryAction({ counterId: counter.id, day, note });
+        ? await updateEntryAction({ id: editingId, day, note, amount: amt })
+        : await addEntryAction({ counterId: counter.id, day, note, amount: amt });
       if (res.error) {
         setError(res.error);
         return;
@@ -90,16 +102,46 @@ export default function EntryDialog({
             </div>
             <div className="text-sm text-white/80">
               {year}
-              {counter.goal ? ` · cilj ${counter.goal}×` : ""}
+              {counter.goal ? ` · cilj ${fmtNum(counter.goal)}${unit ? ` ${unit}` : "×"}` : ""}
+              {unit ? ` · ${fmtNum(stats.sum)} ${unit} skupaj` : ""}
             </div>
           </div>
-          <span key={entries.length} className="counter-pop text-5xl font-black tabular-nums drop-shadow">
-            {entries.length}
-          </span>
+          <div className="text-right">
+            <span key={stats.main} className="counter-pop block text-5xl font-black tabular-nums leading-none drop-shadow">
+              {fmtNum(stats.main)}
+            </span>
+            {unit && <span className="text-[11px] font-semibold uppercase tracking-widest text-white/80">{stats.mainLabel}</span>}
+          </div>
         </div>
       }
     >
       <form onSubmit={submit} className="space-y-3">
+        {unit && (
+          <div className="relative">
+            <Input
+              type="text"
+              inputMode="decimal"
+              autoFocus
+              aria-label={`Količina (${unit})`}
+              placeholder="0"
+              value={amount}
+              onChange={(e) => setAmount(e.target.value.replace(/[^0-9.,]/g, ""))}
+              className="pr-14 text-2xl font-bold tabular-nums"
+            />
+            <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-sm font-semibold text-gray-400">
+              {unit}
+            </span>
+          </div>
+        )}
+        {unit && counter.goal !== null && stats.remaining !== null && amountNum !== null && amountNum > 0 && !editingId && (
+          <p className="text-xs text-gray-500 dark:text-gray-400">
+            Po vnosu še{" "}
+            <span className="font-semibold text-gray-800 dark:text-gray-200">
+              {fmtNum(Math.max(0, stats.remaining - amountNum))} {unit}
+            </span>{" "}
+            do cilja
+          </p>
+        )}
         <div className="flex gap-2">
           <Input
             type="date"
@@ -167,10 +209,18 @@ export default function EntryDialog({
                     setEditingId(e.id);
                     setDay(e.day);
                     setNote(e.note ?? "");
+                    setAmount(e.amount !== null ? String(e.amount).replace(".", ",") : "");
                   }}
                   className="min-w-0 flex-1 text-left"
                 >
-                  <div className="text-sm font-medium">{fmtDay(e.day)}</div>
+                  <div className="flex items-baseline gap-2 text-sm font-medium">
+                    {fmtDay(e.day)}
+                    {unit && e.amount !== null && (
+                      <span className="font-bold tabular-nums" style={{ color: col.b }}>
+                        {fmtNum(e.amount)} {unit}
+                      </span>
+                    )}
+                  </div>
                   {e.note && <div className="whitespace-pre-wrap break-words text-sm text-gray-500 dark:text-gray-400">{e.note}</div>}
                 </button>
                 <button

@@ -26,5 +26,6 @@ export async function getEntries(supabase: Client, year: number): Promise<BingoC
     .lte("day", `${year}-12-31`)
     .order("day", { ascending: false })
     .order("created_at", { ascending: false });
-  return data ?? [];
+  // numeric pride iz PostgREST lahko kot niz
+  return (data ?? []).map((e) => ({ ...e, amount: e.amount === null ? null : Number(e.amount) }));
 }

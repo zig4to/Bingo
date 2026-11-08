@@ -26,6 +26,8 @@ export default function CounterDialog({
   const [name, setName] = useState(counter?.name ?? defaultName);
   const [color, setColor] = useState(counter?.color ?? defaultColor);
   const [goal, setGoal] = useState(counter?.goal ? String(counter.goal) : "");
+  const [useUnit, setUseUnit] = useState(!!counter?.unit);
+  const [unit, setUnit] = useState(counter?.unit ?? "km");
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [pending, start] = useTransition();
@@ -34,7 +36,13 @@ export default function CounterDialog({
     e.preventDefault();
     setError(null);
     start(async () => {
-      const res = await saveCounterAction({ id: counter?.id ?? null, name, color, goal: goal ? Number(goal) : null });
+      const res = await saveCounterAction({
+        id: counter?.id ?? null,
+        name,
+        color,
+        goal: goal ? Number(goal) : null,
+        unit: useUnit ? unit.trim() || null : null,
+      });
       if (res.error) setError(res.error);
       else onClose();
     });
@@ -99,14 +107,65 @@ export default function CounterDialog({
           </div>
         </div>
 
-        <Field label="Letni cilj (neobvezno)" htmlFor="counter-goal">
+        {/* Enota: števec šteje količino (npr. km) in odšteva od cilja. */}
+        <div className="rounded-2xl border border-gray-200 p-3 dark:border-gray-800">
+          <label className="flex cursor-pointer items-start gap-3">
+            <input
+              type="checkbox"
+              checked={useUnit}
+              onChange={(e) => setUseUnit(e.target.checked)}
+              className="mt-0.5 h-5 w-5 shrink-0 cursor-pointer rounded accent-orange-600"
+            />
+            <span className="text-sm">
+              <span className="font-medium text-gray-800 dark:text-gray-200">Štej količino v enoti</span>
+              <span className="block text-gray-500 dark:text-gray-400">
+                Pri vsakem vnosu vpišeš količino (npr. 42 km), od cilja se odšteva.
+              </span>
+            </span>
+          </label>
+          {useUnit && (
+            <div className="mt-3 flex items-center gap-2 pl-8">
+              <Input
+                aria-label="Enota"
+                value={unit}
+                maxLength={12}
+                placeholder="km"
+                onChange={(e) => setUnit(e.target.value)}
+                className="w-28"
+                required
+              />
+              <div className="flex flex-wrap gap-1">
+                {["km", "m", "h", "kg"].map((u) => (
+                  <button
+                    key={u}
+                    type="button"
+                    onClick={() => setUnit(u)}
+                    className="rounded-full border border-gray-300 px-2.5 py-1 text-xs font-medium text-gray-600 hover:bg-gray-100 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-800"
+                  >
+                    {u}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+          {counter && counter.unit && !useUnit && (
+            <p className="mt-2 pl-8 text-xs text-amber-600 dark:text-amber-400">
+              Brez enote se šteje samo število vnosov; vpisane količine ostanejo shranjene.
+            </p>
+          )}
+        </div>
+
+        <Field
+          label={useUnit && unit.trim() ? `Letni cilj v ${unit.trim()} (neobvezno)` : "Letni cilj (neobvezno)"}
+          htmlFor="counter-goal"
+        >
           <Input
             id="counter-goal"
             type="number"
             inputMode="numeric"
             min={1}
-            max={100000}
-            placeholder="npr. 50"
+            max={1000000}
+            placeholder={useUnit ? "npr. 2000" : "npr. 50"}
             value={goal}
             onChange={(e) => setGoal(e.target.value)}
           />

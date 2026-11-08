@@ -61,7 +61,7 @@ Ni testov (`npm test` ne obstaja).
 |---|---|---|
 | `0001_init` | `bingo_boards` (`user_id` default `auth.uid()`, `year`, `title` default „Adventure Bingo“, `size` 3–6, unique `(user_id, year)`), `bingo_cells` (`board_id`, `position` 0…size²−1 po vrsticah, `text` ≤ 120, `done`, `done_at`, `note`, `updated_at`, unique `(board_id, position)`), RLS: samo lastnik (celice prek table) | izvedena 2026-11-08 (`bingo_init`) |
 | `seed_2026.sql` | Adventure Bingo 2026 s 25 cilji s slike za `ziga.skater@gmail.com` (idempotentno, `on conflict`) | izveden 2026-11-08 (`bingo_seed_2026`) |
-| `0002_counters` | `bingo_counters` (`name` ≤ 40, `color` = ključ iz `src/lib/counter/colors.ts`, `goal` neobvezen letni cilj, `position`), `bingo_counter_entries` (`counter_id`, `user_id`, `day` date, `note` ≤ 500), RLS: samo lastnik (vnos le v svoj števec) | **še NI izvedena** — stran Števec do takrat ne deluje |
+| `0002_counters` | `bingo_counters` (`name` ≤ 40, `color` = ključ iz `src/lib/counter/colors.ts`, `goal` neobvezen letni cilj ≤ 1.000.000, `unit` neobvezna enota ≤ 12 znakov, `position`), `bingo_counter_entries` (`counter_id`, `user_id`, `day` date, `amount` numeric(12,2) > 0 — samo pri števcu z enoto, `note` ≤ 500), RLS: samo lastnik (vnos le v svoj števec) | **še NI izvedena** — stran Števec do takrat ne deluje |
 
 Migracije se izvajajo prek Supabase MCP `apply_migration`. Auto mode jih
 zavrača kot „Production Deploy“ — Žiga mora klic odobriti (enkratno ali s
@@ -113,6 +113,7 @@ Nastavitve. Drseča vsebina in vrstica let imata razred `no-scrollbar`
 ### `/stevec` — Števec (`CounterBoard`)
 
 - `?leto=YYYY` (‹ › med leti), seštevek = število vnosov v letu.
+- **Števec z enoto** (checkbox „Štej količino v enoti“ v `CounterDialog`, hitre izbire km/m/h/kg): vsak vnos ima količino, cilj je v enoti (npr. 2000 km), kartica pokaže **preostanek** („1.958 km še do cilja“), ko je cilj dosežen ali ga ni, pa vsoto („km letos“). Izračun v `src/lib/counter/stats.ts` (`counterStats`, `fmtNum` = sl-SI, največ 1 decimalka). `getEntries` pretvori `amount` v število (numeric lahko pride kot niz). Izklop enote na obstoječem števcu količin ne briše, le ne prikazuje.
 - Kartice (`CounterCard`): preliv iz `COUNTER_COLORS` (10 barv, inline
   `style`, ne Tailwind razredi), barvni sij, zbledela začetnica v ozadju,
   veliko število (`counter-pop` animacija ob spremembi — `key={count}`),
