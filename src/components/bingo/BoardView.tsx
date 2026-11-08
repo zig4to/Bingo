@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useRef, useState, useTransition } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import type { BingoBoard, BingoCell } from "@/lib/types/database.types";
@@ -69,11 +69,30 @@ export default function BoardView({
   const [editing, setEditing] = useState<CellDraft | null>(null);
   const [dialog, setDialog] = useState<"new" | "rename" | "delete" | null>(null);
 
+  // Kljukanje zahteva dva tapa na isto polje: prvi ga „oboroži“ (obroba + namig),
+  // drugi v 3 s preklopi opravljeno. Tap drugam ali premor prvega razveljavi.
+  const [armed, setArmed] = useState<number | null>(null);
+  const armTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  function disarm() {
+    if (armTimer.current) clearTimeout(armTimer.current);
+    armTimer.current = null;
+    setArmed(null);
+  }
+
   function tap(slot: (typeof slots)[number]) {
     if (mode === "uredi" || !slot.text) {
+      disarm();
       setEditing(slot);
       return;
     }
+    if (armed !== slot.position) {
+      if (armTimer.current) clearTimeout(armTimer.current);
+      setArmed(slot.position);
+      armTimer.current = setTimeout(() => setArmed(null), 3000);
+      return;
+    }
+    disarm();
     const next = !slot.done;
     setOverrides((o) => ({ ...o, [slot.position]: next }));
     startToggle(async () => {
@@ -159,7 +178,9 @@ export default function BoardView({
                     ? "bg-orange-200 text-orange-950 dark:bg-orange-800/70 dark:text-orange-50"
                     : "bg-orange-100 text-orange-900 dark:bg-orange-950/80 dark:text-orange-100"
                   : "bg-[#fbf5ec] text-orange-900 hover:bg-orange-50 dark:bg-gray-900 dark:text-orange-100/90 dark:hover:bg-gray-800",
-                mode === "uredi" && "outline-dashed outline-1 -outline-offset-4 outline-orange-300/60 dark:outline-orange-700/40"
+                mode === "uredi" && "outline-dashed outline-1 -outline-offset-4 outline-orange-300/60 dark:outline-orange-700/40",
+                armed === s.position && "z-10 outline outline-2 -outline-offset-2 outline-orange-500 dark:outline-orange-400",
+                "touch-manipulation select-none"
               )}
             >
               {s.text ? (
@@ -174,6 +195,11 @@ export default function BoardView({
                   <span className="flex h-[58%] w-[58%] -rotate-12 items-center justify-center rounded-full border-[3px] border-orange-600/80 text-orange-600/90 dark:border-orange-400/80 dark:text-orange-400">
                     <IconCheck className="h-1/2 w-1/2" strokeWidth={3} />
                   </span>
+                </span>
+              )}
+              {armed === s.position && (
+                <span className="pointer-events-none absolute inset-x-0 bottom-0.5 text-[8px] font-semibold normal-case text-orange-600 dark:text-orange-400 sm:bottom-1 sm:text-[10px]">
+                  {s.done ? "še enkrat = odkljukaj" : "še enkrat = opravljeno"}
                 </span>
               )}
             </button>
@@ -208,7 +234,10 @@ export default function BoardView({
               key={m}
               type="button"
               aria-pressed={mode === m}
-              onClick={() => setMode(m)}
+              onClick={() => {
+                disarm();
+                setMode(m);
+              }}
               className={clsx(
                 "flex items-center gap-1.5 rounded-md px-3 py-1.5 text-sm font-medium",
                 mode === m ? "bg-orange-600 text-white" : "text-gray-600 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-800"
@@ -222,7 +251,7 @@ export default function BoardView({
       </div>
       <p className="text-xs text-gray-500 dark:text-gray-400">
         {mode === "kljukaj"
-          ? "Tapni cilj, da ga označiš kot opravljenega. Za urejanje besedila preklopi na Uredi."
+          ? "Tapni cilj dvakrat, da ga označiš kot opravljenega (ali odkljukaš). Za urejanje besedila preklopi na Uredi."
           : "Tapni polje in vpiši cilj. Ko si zadovoljen, preklopi na Kljukaj."}
       </p>
 
