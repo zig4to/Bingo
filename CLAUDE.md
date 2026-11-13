@@ -16,7 +16,7 @@ Osebna aplikacija za letne cilje (uporabnik: Žiga). Dva dela:
    kolikokrat letno si nekaj naredil; vsak vnos ima datum in opombo. Barvne
    kartice („pille“) na sredini zaslona, vsaka svoje barve.
 
-Ogrodje je kopija aplikacije **Kvit** (prijava, SSO iz huba TomsStudios, tema,
+Ogrodje je kopija aplikacije **Kvit** (prijava, SSO iz huba Bitneverse, tema,
 PWA/service worker, UI primitivi), brez gospodinjstev — vse je na uporabnika.
 Isti Supabase projekt **ProjektiBaze** (`abjnxhfxjolwwxlckkje`) kot
 Pisi/Posel/Vzlet/Cekar/Kvit, tabele s predpono `bingo_`.
@@ -46,13 +46,13 @@ Ni testov (`npm test` ne obstaja).
   (2026-11-08) je preusmeril na `vercel.com/sso-api` = vklopljen **Deployment
   Protection** (Vercel Authentication). Za uporabo s telefona/iz huba ga
   izklopi v Vercel → Settings → Deployment Protection ali uporabi produkcijsko
-  domeno iz Settings → Domains (in jo zamenjaj v TomsStudios + Iskri).
+  domeno iz Settings → Domains (in jo zamenjaj v Bitneverse + Iskri).
 - Registrirano v zbirki (2026-11-08, commitano, push čaka na Žigino potrditev):
-  TomsStudios `apps-registry.js` (id `bingo`, podnaslov „Letni cilji in
+  Bitneverse `apps-registry.js` (id `bingo`, podnaslov „Letni cilji in
   dogodivščine“, za Kvitom, `VERZIJA` v `sw.js` → `v54`), Iskra `script.js`
   `APPS` (id `bingo`, prvi po abecedi, `iskra-v48`). **Ni** v zaganjalnik
   `apps.json` (port bi bil 3008). Drugim uporabnikom hub kartico pokaže šele,
-  ko jim admin v TomsStudios `admin.html` dodeli dostop (`app_access`).
+  ko jim admin v Bitneverse `admin.html` dodeli dostop (`app_access`).
 - **Pred `git push` vedno vprašaj Žigo.**
 
 ## Baza (Supabase)
@@ -135,6 +135,10 @@ Tema, e-pošta, odjava.
 - Žiga (`ziga.skater@gmail.com`): Adventure Bingo **2026**, 5 × 5, 25 ciljev
   s slike (zapisani z malimi črkami, prikaz je uppercase; „Buschcraft“ ostal
   kot na sliki), nič še ni odkljukano.
+- Tina Brdnik (`tina.brdnik@gmail.com`): „Šljokica Tina B. Bingo“ **2026**,
+  5 × 5 s Tinine slike (`supabase/seed_2026_tina.sql`, izveden 2026-11-11 kot
+  `bingo_seed_2026_tina`); 8 prečrtanih ciljev + sredinsko „Prosto polje“ =
+  9 opravljenih.
 - Števcev še ni (tabele obstajajo od 2026-11-08).
 
 ## Pasti
